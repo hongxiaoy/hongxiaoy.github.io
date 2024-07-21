@@ -102,7 +102,7 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
                   <span class="icon">
                     <i class="ai ai-arxiv"></i>
                   </span>
-                  <span>arXiv</span>
+                  <span>arXiv</span></a>
 
 
 <!-- Paper abstract -->
