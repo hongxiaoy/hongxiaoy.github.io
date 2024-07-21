@@ -21,7 +21,6 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
 <span class="author-block"><sup>1</sup>School of Artificial Intelligence, University of Chinese Academy of Sciences (UCAS)</span><br>
 <span class="author-block"><sup>2</sup>NLPR, MAIS, Institute of Automation, Chinese Academy of Sciences (CASIA)</span><br>
 <span class="author-block"><sup>3</sup>Centre for Artificial Intelligence and Robotics (HKISI_CAS)</span><br>
-<b>ECCV 2024</b></span>
 
 <html>
 <head>
@@ -68,7 +67,6 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
 </head>
-<body>
 
 
   <section class="hero">
@@ -175,7 +173,4 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
 <!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
 
     <!-- End of Statcounter Code -->
-
-  </body>
-  </html>
 
