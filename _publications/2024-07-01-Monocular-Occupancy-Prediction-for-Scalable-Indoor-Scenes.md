@@ -6,6 +6,7 @@ excerpt: 'Camera-based 3D occupancy prediction has recently garnered increasing 
 date: 2024-07-01
 venue: 'The European Conference on Computer Vision (ECCV)'
 paperurl: 'https://arxiv.org/pdf/2407.11730'
+codeurl: 'https://github.com/hongxiaoy/ISO'
 citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub Journal of Bugs</i>. 1(3).'
 ---
 
@@ -95,7 +96,7 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
 
                   <!-- Github link -->
                   <span class="link-block">
-                    <a href="https://github.com/hongxiaoy/ISO" target="_blank"
+                    <a href="" target="_blank"
                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                       <i class="fab fa-github"></i>
