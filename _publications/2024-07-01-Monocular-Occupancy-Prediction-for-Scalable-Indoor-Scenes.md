@@ -6,7 +6,6 @@ excerpt: 'Camera-based 3D occupancy prediction has recently garnered increasing 
 date: 2024-07-01
 venue: 'The European Conference on Computer Vision (ECCV)'
 paperurl: 'https://arxiv.org/pdf/2407.11730'
-citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub Journal of Bugs</i>. 1(3).'
 ---
 
 <span class="author-block">
