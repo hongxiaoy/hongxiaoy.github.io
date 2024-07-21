@@ -1,7 +1,7 @@
 ---
 title: "Monocular Occupancy Prediction for Scalable Indoor Scenes"
 collection: publications
-permalink: 'https://hongxiaoy.github.io/ISO'
+permalink: /publication/2024-07-01-Monocular-Occupancy-Prediction-for-Scalable-Indoor-Scenes
 excerpt: 'Camera-based 3D occupancy prediction has recently garnered increasing attention in outdoor driving scenes. However, research in indoor scenes remains relatively unexplored. The core differences in indoor scenes lie in the complexity of scene scale and the variance in object size. In this paper, we propose a novel method, named ISO, for predicting indoor scene occupancy using monocular images. ISO harnesses the advantages of a pretrained depth model to achieve accurate depth predictions. Furthermore, we introduce the Dual Feature Line of Sight Projection (D-FLoSP) module within ISO, which enhances the learning of 3D voxel features. To foster further research in this domain, we introduce Occ-ScanNet, a large-scale occupancy benchmark for indoor scenes. With a dataset size 40 times larger than the NYUv2 dataset, it facilitates future scalable research in indoor scene analysis. Experimental results on both NYUv2 and Occ-ScanNet demonstrate that our method achieves state-of-the-art performance.'
 date: 2024-07-01
 venue: 'The European Conference on Computer Vision (ECCV)'
@@ -9,9 +9,15 @@ paperurl: 'https://arxiv.org/pdf/2407.11730'
 citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub Journal of Bugs</i>. 1(3).'
 ---
 
+<span class="author-block">
+<a href="https://orcid.org/0009-0003-9249-2726" target="_blank">Hongxiao Yu</a><sup>1,2</sup>,</span>
+<span class="author-block">
+<a href="https://orcid.org/0000-0002-6360-1431" target="_blank">Yuqi Wang</a><sup>1,2</sup>,</span>
+<span class="author-block">
+<a href="https://orcid.org/0000-0002-9555-1897" target="_blank">Yuntao Chen</a><sup>3</sup>,</span>
+<span class="author-block">
+<a href="https://orcid.org/0000-0003-2648-3875" target="_blank">Zhaoxiang Zhang</a><sup>1,2,3</sup></span>
 
-
-<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -65,18 +71,10 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">Monocular Occupancy Prediction for Scalable Indoor Scenes</h1>
             <div class="is-size-5 publication-authors">
               <!-- Paper authors -->
               <span class="author-block">
-                <a href="https://orcid.org/0009-0003-9249-2726" target="_blank">Hongxiao Yu</a><sup>1,2</sup>,</span>
-                <span class="author-block">
-                  <a href="https://orcid.org/0000-0002-6360-1431" target="_blank">Yuqi Wang</a><sup>1,2</sup>,</span>
-                  <span class="author-block">
-                    <a href="https://orcid.org/0000-0002-9555-1897" target="_blank">Yuntao Chen</a><sup>3</sup>,</span>
-                    <span class="author-block">
-                    <a href="https://orcid.org/0000-0003-2648-3875" target="_blank">Zhaoxiang Zhang</a><sup>1,2,3</sup>
-                  </span>
+                
                   </div>
 
                   <div class="is-size-5 publication-authors">
