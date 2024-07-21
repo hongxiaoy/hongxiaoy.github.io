@@ -18,6 +18,11 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
 <span class="author-block">
 <a href="https://orcid.org/0000-0003-2648-3875" target="_blank">Zhaoxiang Zhang</a><sup>1,2,3</sup></span>
 
+<span class="author-block"><sup>1</sup>School of Artificial Intelligence, University of Chinese Academy of Sciences (UCAS)</span><br>
+<span class="author-block"><sup>2</sup>NLPR, MAIS, Institute of Automation, Chinese Academy of Sciences (CASIA)</span><br>
+<span class="author-block"><sup>3</sup>Centre for Artificial Intelligence and Robotics (HKISI_CAS)</span><br>
+<b>ECCV 2024</b></span>
+
 <html>
 <head>
   <meta charset="utf-8">
@@ -73,16 +78,9 @@ citation: 'Your Name, You. (2024). &quot;Paper Title Number 3.&quot; <i>GitHub J
           <div class="column has-text-centered">
             <div class="is-size-5 publication-authors">
               <!-- Paper authors -->
-              <span class="author-block">
-                
-                  </div>
+              
 
-                  <div class="is-size-5 publication-authors">
-                    <span class="author-block"><sup>1</sup>School of Artificial Intelligence, University of Chinese Academy of Sciences (UCAS)</span>
-                    <span class="author-block"><sup>2</sup>NLPR, MAIS, Institute of Automation, Chinese Academy of Sciences (CASIA)</span>
-                    <span class="author-block"><sup>3</sup>Centre for Artificial Intelligence and Robotics (HKISI_CAS)</span>
-                    <br><b>ECCV 2024</b></span>
-                  </div>
+                  
 
                   <div class="column has-text-centered">
                     <div class="publication-links">
