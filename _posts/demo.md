@@ -1,0 +1,16 @@
+---
+layout: post
+title: A Demo Post
+date: 2026-03-18 13:43:16
+description: march & april, looking forward to summer
+tags: formatting links
+categories: sample-posts
+---
+
+# Head 1
+
+text 1
+
+## Head 2
+
+text 2
