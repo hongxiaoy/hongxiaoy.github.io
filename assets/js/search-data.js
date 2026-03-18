@@ -16,26 +16,15 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/blog/";
           },
-        },{id: "post-a-demo-post",
+        },{id: "post-dream2flow-用-3d-物体流连接视频生成与开放世界操作",
         
-          title: "A Demo Post",
+          title: "Dream2Flow 用 3D 物体流连接视频生成与开放世界操作",
         
-        description: "march &amp; april, looking forward to summer",
+        description: "Dream2Flow 利用 3D 物体流作为中间接口，将预训练视频生成模型的零样本视觉预测转化为可执行的机器人操控命令，通过分离&quot;物体状态变化&quot;与&quot;机器人执行方式&quot;克服本体差距，使开放世界操控无需任务特定演示数据。",
         section: "Posts",
         handler: () => {
           
-            window.location.href = "/blog/2026/demo/";
-          
-        },
-      },{id: "post-a-post-with-code",
-        
-          title: "a post with code",
-        
-        description: "an example of a blog post with some code",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/blog/2015/code/";
+            window.location.href = "/blog/2026/Dream2Flow/";
           
         },
       },{id: "books-the-godfather",
