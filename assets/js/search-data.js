@@ -16,7 +16,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/blog/";
           },
-        },{id: "post-dream2flow-用-3d-物体流连接视频生成与开放世界操作",
+        },{id: "post-data-processing-for-pi-model-in-robotwin",
+        
+          title: "Data Processing for PI Model in RoboTwin",
+        
+        description: "A detailed guide on converting raw RoboTwin data to HDF5 format for PI model training, including state-only to state-action transformation, image encoding, and instruction processing.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/RoboTwinProcessData/";
+          
+        },
+      },{id: "post-dream2flow-用-3d-物体流连接视频生成与开放世界操作",
         
           title: "Dream2Flow 用 3D 物体流连接视频生成与开放世界操作",
         
