@@ -542,7 +542,7 @@ def port_aloha(
     episodes: list[int] | None = None,
     push_to_hub: bool = False,
     is_mobile: bool = False,
-    mode: Literal["video", "image"] = "image",
+    mode: Literal["video", "image"] = "image",  # set to "video" if you want to save images as video
     dataset_config: DatasetConfig = DEFAULT_DATASET_CONFIG,
 ):
     breakpoint()
