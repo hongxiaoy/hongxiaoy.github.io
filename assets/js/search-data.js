@@ -27,6 +27,17 @@ ninja.data = [{
             window.location.href = "/blog/2026/HDF5_to_LeRobot_v20/";
           
         },
+      },{id: "post-converting-absolute-action-to-delta-action",
+        
+          title: "Converting Absolute Action to Delta Action",
+        
+        description: "A comprehensive guide on transforming absolute action into delta action for PI series algorithms, including step-by-step process and implementation details.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/Absolute_Action_to_Delta_Action/";
+          
+        },
       },{id: "post-data-processing-for-pi-model-in-robotwin",
         
           title: "Data Processing for PI Model in RoboTwin",
