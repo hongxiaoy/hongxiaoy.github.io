@@ -1,0 +1,514 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Converting HDF5 Format Dataset to LeRobot v2.0 | Hongxiao Yu </title> <meta name="author" content="Hongxiao Yu"> <meta name="description" content="A comprehensive guide on transforming HDF5 format datasets into LeRobot v2.0 format, including dataset creation, helper functions, and data population processes."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <link rel="stylesheet" href="/assets/css/bootstrap.min.css?v=a4b3f509e79c54a512b890d73235ef04"> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/css/mdb.min.css" integrity="sha256-jpjYvU3G3N6nrrBwXJoVEYI/0zw8htfFnhT9ljN3JJw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="/assets/css/academicons.min.css?v=f0b7046b84e425c55f3463ac249818f5"> <link defer rel="stylesheet" href="/assets/css/scholar-icons.css?v=62b2ac103a88034e6882a5be5f3e2772"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=d41d8cd98f00b204e9800998ecf8427e"> <link rel="canonical" href="https://hongxiaoy.github.io/blog/2026/HDF5_to_LeRobot_v20/"> <script src="/assets/js/theme.js?v=5fea5159b787642c1bbc1f334d60f883"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Hongxiao</span> Yu </a> <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse text-right" id="navbarNav"> <ul class="navbar-nav ml-auto flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">Home </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog </a> </li> <li class="nav-item"> <button id="search-toggle" title="Search" onclick="openSearchModal()"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" title="Change theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Converting HDF5 Format Dataset to LeRobot v2.0</h1> <p class="post-meta"> Created on April 02, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/robotwin"> <i class="fa-solid fa-hashtag fa-sm"></i> RoboTwin</a>   <a href="/blog/tag/dataset-processing"> <i class="fa-solid fa-hashtag fa-sm"></i> Dataset-Processing</a>   ·   <a href="/blog/category/dataset-processing"> <i class="fa-solid fa-tag fa-sm"></i> Dataset-Processing</a> </p> </header> <article class="post-content"> <div id="table-of-contents"> <ul id="toc" class="section-nav"> <li class="toc-entry toc-h1"> <a href="#-creating-the-lerobot-dataset">📁 Creating the LeRobot Dataset</a> <ul> <li class="toc-entry toc-h2"> <a href="#-key-components">🔧 Key Components</a> <ul> <li class="toc-entry toc-h3"><a href="#joint-and-camera-configuration">Joint and Camera Configuration</a></li> <li class="toc-entry toc-h3"><a href="#features-definition">Features Definition</a></li> </ul> </li> </ul> </li> <li class="toc-entry toc-h1"><a href="#-helper-functions">🔧 Helper Functions</a></li> <li class="toc-entry toc-h1"><a href="#-populating-the-dataset">📊 Populating the Dataset</a></li> <li class="toc-entry toc-h1"> <a href="#-complete-code">📝 Complete Code</a> <ul> <li class="toc-entry toc-h2"><a href="#-conclusion">🎉 Conclusion</a></li> </ul> </li> </ul> </div> <hr> <div id="markdown-content"> <p>👋 Welcome to this guide on converting HDF5 format datasets to LeRobot v2.0 format! This post will walk you through the complete process of transforming your robot learning data into the standardized LeRobot format.</p> <p>💻 The main code is located under <code class="language-plaintext highlighter-rouge">policy/pi05/examples/aloha_real/convert_aloha_data_to_lerobot_robotwin.py</code> in the RoboTwin toolkit root directory.</p> <p>📋 The conversion process consists of several key steps:</p> <ol> <li>📁 Creating the LeRobot dataset instance with the appropriate interface</li> <li>🔧 Defining helper functions for data loading and processing</li> <li>📊 Populating the dataset with HDF5 data</li> </ol> <p>The complete code will be provided at the end of this post for your reference.</p> <h1 id="-creating-the-lerobot-dataset">📁 Creating the LeRobot Dataset</h1> <p>To create a LeRobot dataset, you need to provide several key parameters:</p> <ul> <li> <code class="language-plaintext highlighter-rouge">repo_id</code>: Unique identifier for your dataset</li> <li> <code class="language-plaintext highlighter-rouge">robot_type</code>: Type of robot (e.g., “aloha” or “mobile_aloha”)</li> <li> <code class="language-plaintext highlighter-rouge">mode</code>: Storage mode for images (“video” or “image”)</li> <li>Optional parameters: <code class="language-plaintext highlighter-rouge">has_velocity</code>, <code class="language-plaintext highlighter-rouge">has_effort</code>, and <code class="language-plaintext highlighter-rouge">dataset_config</code> </li> </ul> <h2 id="-key-components">🔧 Key Components</h2> <h3 id="joint-and-camera-configuration">Joint and Camera Configuration</h3> <p>You need to specify the names of different joint values (motor names) and camera names to ensure proper data mapping.</p> <h3 id="features-definition">Features Definition</h3> <p>A critical requirement for LeRobot datasets is the <code class="language-plaintext highlighter-rouge">features</code> field in the <code class="language-plaintext highlighter-rouge">meta/info.json</code> file. This field defines the structure of your dataset, including:</p> <ul> <li> <strong>States</strong>: Robot joint positions and gripper states</li> <li> <strong>Actions</strong>: Commands sent to the robot</li> <li> <strong>Optional</strong>: Velocity and effort data (if available)</li> <li> <strong>Images</strong>: Camera feeds from different viewpoints</li> </ul> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">create_empty_dataset</span><span class="p">(</span>
+    <span class="n">repo_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">robot_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="sh">"</span><span class="s">video</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">image</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="sh">"</span><span class="s">video</span><span class="sh">"</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">has_velocity</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="n">has_effort</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span> <span class="o">=</span> <span class="n">DEFAULT_DATASET_CONFIG</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LeRobotDataset</span><span class="p">:</span>
+    <span class="c1"># ==========================================
+</span>    <span class="c1">#   Define joint names and camera names
+</span>    <span class="c1"># ==========================================
+</span>    <span class="n">motors</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sh">"</span><span class="s">left_waist</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_shoulder</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_elbow</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_forearm_roll</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_wrist_angle</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_wrist_rotate</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_gripper</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_waist</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_shoulder</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_elbow</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_forearm_roll</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_wrist_angle</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_wrist_rotate</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_gripper</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">cameras</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sh">"</span><span class="s">cam_high</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">cam_left_wrist</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">cam_right_wrist</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">]</span>
+    
+    <span class="c1"># ==============================================
+</span>    <span class="c1">#   Define features of the dataset
+</span>    <span class="c1"># ==============================================
+</span>    <span class="n">features</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="sh">"</span><span class="s">observation.state</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+        <span class="sh">"</span><span class="s">action</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">has_velocity</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.velocity</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">has_effort</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.effort</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cameras</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">observation.images.</span><span class="si">{</span><span class="n">cam</span><span class="si">}</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="sh">"</span><span class="s">channels</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">height</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">width</span><span class="sh">"</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="nc">Path</span><span class="p">(</span><span class="n">HF_LEROBOT_HOME</span> <span class="o">/</span> <span class="n">repo_id</span><span class="p">).</span><span class="nf">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="p">.</span><span class="nf">rmtree</span><span class="p">(</span><span class="n">HF_LEROBOT_HOME</span> <span class="o">/</span> <span class="n">repo_id</span><span class="p">)</span>
+
+    <span class="c1"># Return the created LeRobot Dataset
+</span>    <span class="k">return</span> <span class="n">LeRobotDataset</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">repo_id</span><span class="o">=</span><span class="n">repo_id</span><span class="p">,</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">robot_type</span><span class="o">=</span><span class="n">robot_type</span><span class="p">,</span>
+        <span class="n">features</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
+        <span class="n">use_videos</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">use_videos</span><span class="p">,</span>
+        <span class="n">tolerance_s</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">tolerance_s</span><span class="p">,</span>
+        <span class="n">image_writer_processes</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">image_writer_processes</span><span class="p">,</span>
+        <span class="n">image_writer_threads</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">image_writer_threads</span><span class="p">,</span>
+        <span class="n">video_backend</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">video_backend</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></div> <h1 id="-helper-functions">🔧 Helper Functions</h1> <p>To streamline the conversion process, we define several helper functions that handle common tasks:</p> <ol> <li> <strong>Velocity and Effort Detection</strong>: Functions to check if velocity or effort information is available in the dataset</li> <li> <strong>Image Loading</strong>: Functions to load and process images from the HDF5 files</li> <li> <strong>Episode Data Loading</strong>: Functions to load complete episode data including states, actions, and images</li> </ol> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">has_velocity</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sh">"</span><span class="s">/observations/qvel</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span>
+
+
+<span class="k">def</span> <span class="nf">has_effort</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sh">"</span><span class="s">/observations/effort</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span>
+
+
+<span class="k">def</span> <span class="nf">load_raw_images_per_camera</span><span class="p">(</span><span class="n">ep</span><span class="p">:</span> <span class="n">h5py</span><span class="p">.</span><span class="n">File</span><span class="p">,</span> <span class="n">cameras</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="c1"># ========================================================================================
+</span>    <span class="c1">#   key is the camera name, and value is the images array across single episode
+</span>    <span class="c1"># ========================================================================================
+</span>    <span class="n">imgs_per_cam</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">camera</span> <span class="ow">in</span> <span class="n">cameras</span><span class="p">:</span>
+        <span class="n">uncompressed</span> <span class="o">=</span> <span class="n">ep</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">/observations/images/</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">].</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span>
+
+        <span class="k">if</span> <span class="n">uncompressed</span><span class="p">:</span>
+            <span class="c1"># load all images in RAM
+</span>            <span class="n">imgs_array</span> <span class="o">=</span> <span class="n">ep</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">/observations/images/</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">][:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="n">cv2</span>
+
+            <span class="c1"># load one compressed image after the other in RAM and uncompress
+</span>            <span class="n">imgs_array</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">/observations/images/</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">]:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">uint8</span><span class="p">)</span>
+                <span class="c1"># img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)  # 解码为彩色图像
+</span>                <span class="n">imgs_array</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">cv2</span><span class="p">.</span><span class="nf">imdecode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cv2</span><span class="p">.</span><span class="n">IMREAD_COLOR</span><span class="p">))</span>
+            <span class="n">imgs_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">imgs_array</span><span class="p">)</span>
+
+        <span class="n">imgs_per_cam</span><span class="p">[</span><span class="n">camera</span><span class="p">]</span> <span class="o">=</span> <span class="n">imgs_array</span>
+    <span class="k">return</span> <span class="n">imgs_per_cam</span>
+
+
+<span class="k">def</span> <span class="nf">load_raw_episode_data</span><span class="p">(</span>
+    <span class="n">ep_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="bp">None</span><span class="p">,</span>
+<span class="p">]:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">ep_path</span><span class="p">,</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/qpos</span><span class="sh">"</span><span class="p">][:])</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/action</span><span class="sh">"</span><span class="p">][:])</span>
+
+        <span class="n">velocity</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="sh">"</span><span class="s">/observations/qvel</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/qvel</span><span class="sh">"</span><span class="p">][:])</span>
+
+        <span class="n">effort</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="sh">"</span><span class="s">/observations/effort</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">:</span>
+            <span class="n">effort</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/effort</span><span class="sh">"</span><span class="p">][:])</span>
+
+        <span class="n">imgs_per_cam</span> <span class="o">=</span> <span class="nf">load_raw_images_per_camera</span><span class="p">(</span>
+            <span class="n">ep</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="sh">"</span><span class="s">cam_high</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">cam_left_wrist</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">cam_right_wrist</span><span class="sh">"</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">imgs_per_cam</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">effort</span>
+</code></pre></div></div> <h1 id="-populating-the-dataset">📊 Populating the Dataset</h1> <p>The process of converting HDF5 data to LeRobot v2.0 format involves the following steps:</p> <ol> <li>📥 Load HDF5 data for each episode</li> <li>📝 Add task instructions from the instructions.json file</li> <li>🖼️ Process and add images from different cameras</li> <li>📋 Populate each frame with state, action, and image data</li> <li>💾 Save the episode to the LeRobot dataset</li> </ol> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">populate_dataset</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">LeRobotDataset</span><span class="p">,</span>
+    <span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+    <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">episodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="bp">None</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LeRobotDataset</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">episodes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">episodes</span> <span class="o">=</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">ep_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">.</span><span class="nf">tqdm</span><span class="p">(</span><span class="n">episodes</span><span class="p">):</span>
+        <span class="n">ep_path</span> <span class="o">=</span> <span class="n">hdf5_files</span><span class="p">[</span><span class="n">ep_idx</span><span class="p">]</span>
+
+        <span class="c1"># ========================
+</span>        <span class="c1">#   load hdf5 data
+</span>        <span class="c1"># ========================
+</span>        <span class="n">imgs_per_cam</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">effort</span> <span class="o">=</span> <span class="nf">load_raw_episode_data</span><span class="p">(</span><span class="n">ep_path</span><span class="p">)</span>
+        <span class="n">num_frames</span> <span class="o">=</span> <span class="n">state</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># ================================================
+</span>        <span class="c1">#   add prompt randomly from instructions.json
+</span>        <span class="c1"># ================================================
+</span>        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="n">ep_path</span><span class="p">)</span>
+        <span class="n">json_Path</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">dir_path</span><span class="si">}</span><span class="s">/instructions.json</span><span class="sh">"</span>
+
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">json_Path</span><span class="p">,</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_instr</span><span class="p">:</span>
+            <span class="n">instruction_dict</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">f_instr</span><span class="p">)</span>
+            <span class="n">instructions</span> <span class="o">=</span> <span class="n">instruction_dict</span><span class="p">[</span><span class="sh">'</span><span class="s">instructions</span><span class="sh">'</span><span class="p">]</span>
+            <span class="n">instruction</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">choice</span><span class="p">(</span><span class="n">instructions</span><span class="p">)</span>
+        
+        <span class="c1"># ================================================
+</span>        <span class="c1">#   populate each frame with prompt and images
+</span>        <span class="c1"># ================================================
+</span>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_frames</span><span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="sh">"</span><span class="s">observation.state</span><span class="sh">"</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sh">"</span><span class="s">action</span><span class="sh">"</span><span class="p">:</span> <span class="n">action</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sh">"</span><span class="s">task</span><span class="sh">"</span><span class="p">:</span> <span class="n">instruction</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">camera</span><span class="p">,</span> <span class="n">img_array</span> <span class="ow">in</span> <span class="n">imgs_per_cam</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
+                <span class="n">frame</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">observation.images.</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">velocity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.velocity</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">effort</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.effort</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">effort</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">dataset</span><span class="p">.</span><span class="nf">add_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>  <span class="c1"># add single frame data
+</span>        <span class="n">dataset</span><span class="p">.</span><span class="nf">save_episode</span><span class="p">()</span>  <span class="c1"># save episode data
+</span>
+    <span class="k">return</span> <span class="n">dataset</span>
+</code></pre></div></div> <h1 id="-complete-code">📝 Complete Code</h1> <p>Here’s the complete code implementation for your reference:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="sh">"""</span><span class="s">
+Script to convert Aloha hdf5 data to the LeRobot dataset v2.0 format.
+
+Example usage: uv run examples/aloha_real/convert_aloha_data_to_lerobot.py --raw-dir /path/to/raw/data --repo-id &lt;org&gt;/&lt;dataset-name&gt;
+</span><span class="sh">"""</span>
+
+<span class="kn">import</span> <span class="n">dataclasses</span>
+<span class="kn">from</span> <span class="n">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="n">shutil</span>
+<span class="kn">from</span> <span class="n">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span> <span class="n">h5py</span>
+<span class="kn">from</span> <span class="n">lerobot.common.datasets.lerobot_dataset</span> <span class="kn">import</span> <span class="n">HF_LEROBOT_HOME</span>
+<span class="kn">from</span> <span class="n">lerobot.common.datasets.lerobot_dataset</span> <span class="kn">import</span> <span class="n">LeRobotDataset</span>
+<span class="c1"># from lerobot.common.datasets.push_dataset_to_hub._download_raw import download_raw
+</span><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="n">torch</span>
+<span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="n">tyro</span>
+<span class="kn">import</span> <span class="n">json</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="kn">import</span> <span class="n">fnmatch</span>
+
+
+<span class="nd">@dataclasses.dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DatasetConfig</span><span class="p">:</span>
+    <span class="n">use_videos</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">tolerance_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span>
+    <span class="n">image_writer_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">image_writer_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">video_backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="bp">None</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+<span class="n">DEFAULT_DATASET_CONFIG</span> <span class="o">=</span> <span class="nc">DatasetConfig</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_empty_dataset</span><span class="p">(</span>
+    <span class="n">repo_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">robot_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="sh">"</span><span class="s">video</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">image</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="sh">"</span><span class="s">video</span><span class="sh">"</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">has_velocity</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="n">has_effort</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span> <span class="o">=</span> <span class="n">DEFAULT_DATASET_CONFIG</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LeRobotDataset</span><span class="p">:</span>
+    <span class="n">motors</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sh">"</span><span class="s">left_waist</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_shoulder</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_elbow</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_forearm_roll</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_wrist_angle</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_wrist_rotate</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">left_gripper</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_waist</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_shoulder</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_elbow</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_forearm_roll</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_wrist_angle</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_wrist_rotate</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">right_gripper</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">cameras</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sh">"</span><span class="s">cam_high</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">cam_left_wrist</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">cam_right_wrist</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="sh">"</span><span class="s">observation.state</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+        <span class="sh">"</span><span class="s">action</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">has_velocity</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.velocity</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">has_effort</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.effort</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">motors</span><span class="p">),</span> <span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">motors</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cameras</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">observation.images.</span><span class="si">{</span><span class="n">cam</span><span class="si">}</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">dtype</span><span class="sh">"</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+            <span class="sh">"</span><span class="s">shape</span><span class="sh">"</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">),</span>
+            <span class="sh">"</span><span class="s">names</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="sh">"</span><span class="s">channels</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">height</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">width</span><span class="sh">"</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="nc">Path</span><span class="p">(</span><span class="n">HF_LEROBOT_HOME</span> <span class="o">/</span> <span class="n">repo_id</span><span class="p">).</span><span class="nf">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="p">.</span><span class="nf">rmtree</span><span class="p">(</span><span class="n">HF_LEROBOT_HOME</span> <span class="o">/</span> <span class="n">repo_id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">LeRobotDataset</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">repo_id</span><span class="o">=</span><span class="n">repo_id</span><span class="p">,</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">robot_type</span><span class="o">=</span><span class="n">robot_type</span><span class="p">,</span>
+        <span class="n">features</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
+        <span class="n">use_videos</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">use_videos</span><span class="p">,</span>
+        <span class="n">tolerance_s</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">tolerance_s</span><span class="p">,</span>
+        <span class="n">image_writer_processes</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">image_writer_processes</span><span class="p">,</span>
+        <span class="n">image_writer_threads</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">image_writer_threads</span><span class="p">,</span>
+        <span class="n">video_backend</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">.</span><span class="n">video_backend</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_cameras</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="c1"># ignore depth channel, not currently handled
+</span>        <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/images</span><span class="sh">"</span><span class="p">].</span><span class="nf">keys</span><span class="p">()</span> <span class="k">if</span> <span class="sh">"</span><span class="s">depth</span><span class="sh">"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>  <span class="c1"># noqa: SIM118
+</span>
+
+<span class="k">def</span> <span class="nf">has_velocity</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sh">"</span><span class="s">/observations/qvel</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span>
+
+
+<span class="k">def</span> <span class="nf">has_effort</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sh">"</span><span class="s">/observations/effort</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span>
+
+
+<span class="k">def</span> <span class="nf">load_raw_images_per_camera</span><span class="p">(</span><span class="n">ep</span><span class="p">:</span> <span class="n">h5py</span><span class="p">.</span><span class="n">File</span><span class="p">,</span> <span class="n">cameras</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">imgs_per_cam</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">camera</span> <span class="ow">in</span> <span class="n">cameras</span><span class="p">:</span>
+        <span class="n">uncompressed</span> <span class="o">=</span> <span class="n">ep</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">/observations/images/</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">].</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span>
+
+        <span class="k">if</span> <span class="n">uncompressed</span><span class="p">:</span>
+            <span class="c1"># load all images in RAM
+</span>            <span class="n">imgs_array</span> <span class="o">=</span> <span class="n">ep</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">/observations/images/</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">][:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="n">cv2</span>
+
+            <span class="c1"># load one compressed image after the other in RAM and uncompress
+</span>            <span class="n">imgs_array</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">/observations/images/</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">]:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">uint8</span><span class="p">)</span>
+                <span class="c1"># img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)  # 解码为彩色图像
+</span>                <span class="n">imgs_array</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">cv2</span><span class="p">.</span><span class="nf">imdecode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cv2</span><span class="p">.</span><span class="n">IMREAD_COLOR</span><span class="p">))</span>
+            <span class="n">imgs_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">imgs_array</span><span class="p">)</span>
+
+        <span class="n">imgs_per_cam</span><span class="p">[</span><span class="n">camera</span><span class="p">]</span> <span class="o">=</span> <span class="n">imgs_array</span>
+    <span class="k">return</span> <span class="n">imgs_per_cam</span>
+
+
+<span class="k">def</span> <span class="nf">load_raw_episode_data</span><span class="p">(</span>
+    <span class="n">ep_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="bp">None</span><span class="p">,</span>
+<span class="p">]:</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="p">.</span><span class="nc">File</span><span class="p">(</span><span class="n">ep_path</span><span class="p">,</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ep</span><span class="p">:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/qpos</span><span class="sh">"</span><span class="p">][:])</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/action</span><span class="sh">"</span><span class="p">][:])</span>
+
+        <span class="n">velocity</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="sh">"</span><span class="s">/observations/qvel</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/qvel</span><span class="sh">"</span><span class="p">][:])</span>
+
+        <span class="n">effort</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="sh">"</span><span class="s">/observations/effort</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">ep</span><span class="p">:</span>
+            <span class="n">effort</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="sh">"</span><span class="s">/observations/effort</span><span class="sh">"</span><span class="p">][:])</span>
+
+        <span class="n">imgs_per_cam</span> <span class="o">=</span> <span class="nf">load_raw_images_per_camera</span><span class="p">(</span>
+            <span class="n">ep</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="sh">"</span><span class="s">cam_high</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">cam_left_wrist</span><span class="sh">"</span><span class="p">,</span>
+                <span class="sh">"</span><span class="s">cam_right_wrist</span><span class="sh">"</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">imgs_per_cam</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">effort</span>
+
+
+<span class="k">def</span> <span class="nf">populate_dataset</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">LeRobotDataset</span><span class="p">,</span>
+    <span class="n">hdf5_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+    <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">episodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="bp">None</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LeRobotDataset</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">episodes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">episodes</span> <span class="o">=</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">ep_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">.</span><span class="nf">tqdm</span><span class="p">(</span><span class="n">episodes</span><span class="p">):</span>
+        <span class="n">ep_path</span> <span class="o">=</span> <span class="n">hdf5_files</span><span class="p">[</span><span class="n">ep_idx</span><span class="p">]</span>
+
+        <span class="n">imgs_per_cam</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">effort</span> <span class="o">=</span> <span class="nf">load_raw_episode_data</span><span class="p">(</span><span class="n">ep_path</span><span class="p">)</span>
+        <span class="n">num_frames</span> <span class="o">=</span> <span class="n">state</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># add prompt
+</span>        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="n">ep_path</span><span class="p">)</span>
+        <span class="n">json_Path</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">dir_path</span><span class="si">}</span><span class="s">/instructions.json</span><span class="sh">"</span>
+
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">json_Path</span><span class="p">,</span> <span class="sh">'</span><span class="s">r</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_instr</span><span class="p">:</span>
+            <span class="n">instruction_dict</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">f_instr</span><span class="p">)</span>
+            <span class="n">instructions</span> <span class="o">=</span> <span class="n">instruction_dict</span><span class="p">[</span><span class="sh">'</span><span class="s">instructions</span><span class="sh">'</span><span class="p">]</span>
+            <span class="n">instruction</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">choice</span><span class="p">(</span><span class="n">instructions</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_frames</span><span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="sh">"</span><span class="s">observation.state</span><span class="sh">"</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sh">"</span><span class="s">action</span><span class="sh">"</span><span class="p">:</span> <span class="n">action</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sh">"</span><span class="s">task</span><span class="sh">"</span><span class="p">:</span> <span class="n">instruction</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">camera</span><span class="p">,</span> <span class="n">img_array</span> <span class="ow">in</span> <span class="n">imgs_per_cam</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
+                <span class="n">frame</span><span class="p">[</span><span class="sa">f</span><span class="sh">"</span><span class="s">observation.images.</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">velocity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.velocity</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">effort</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">[</span><span class="sh">"</span><span class="s">observation.effort</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">effort</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">dataset</span><span class="p">.</span><span class="nf">add_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="n">dataset</span><span class="p">.</span><span class="nf">save_episode</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">dataset</span>
+
+
+<span class="k">def</span> <span class="nf">port_aloha</span><span class="p">(</span>
+    <span class="n">raw_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">repo_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">raw_repo_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="bp">None</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="n">task</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">"</span><span class="s">DEBUG</span><span class="sh">"</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">episodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="bp">None</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="n">push_to_hub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="n">is_mobile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="sh">"</span><span class="s">video</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">image</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="sh">"</span><span class="s">image</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span> <span class="o">=</span> <span class="n">DEFAULT_DATASET_CONFIG</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="nf">breakpoint</span><span class="p">()</span>
+    <span class="nf">if </span><span class="p">(</span><span class="n">HF_LEROBOT_HOME</span> <span class="o">/</span> <span class="n">repo_id</span><span class="p">).</span><span class="nf">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="p">.</span><span class="nf">rmtree</span><span class="p">(</span><span class="n">HF_LEROBOT_HOME</span> <span class="o">/</span> <span class="n">repo_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">raw_dir</span><span class="p">.</span><span class="nf">exists</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">raw_repo_id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">raw_repo_id must be provided if raw_dir does not exist</span><span class="sh">"</span><span class="p">)</span>
+        <span class="c1"># download_raw(raw_dir, repo_id=raw_repo_id)
+</span>    <span class="n">hdf5_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="nf">walk</span><span class="p">(</span><span class="n">raw_dir</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">fnmatch</span><span class="p">.</span><span class="nf">filter</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="sh">'</span><span class="s">*.hdf5</span><span class="sh">'</span><span class="p">):</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">hdf5_files</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="nf">create_empty_dataset</span><span class="p">(</span>
+        <span class="n">repo_id</span><span class="p">,</span>
+        <span class="n">robot_type</span><span class="o">=</span><span class="sh">"</span><span class="s">mobile_aloha</span><span class="sh">"</span> <span class="k">if</span> <span class="n">is_mobile</span> <span class="k">else</span> <span class="sh">"</span><span class="s">aloha</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">has_effort</span><span class="o">=</span><span class="nf">has_effort</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">),</span>
+        <span class="n">has_velocity</span><span class="o">=</span><span class="nf">has_velocity</span><span class="p">(</span><span class="n">hdf5_files</span><span class="p">),</span>
+        <span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="nf">populate_dataset</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">hdf5_files</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># dataset.consolidate()
+</span>
+    <span class="k">if</span> <span class="n">push_to_hub</span><span class="p">:</span>
+        <span class="n">dataset</span><span class="p">.</span><span class="nf">push_to_hub</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">tyro</span><span class="p">.</span><span class="nf">cli</span><span class="p">(</span><span class="n">port_aloha</span><span class="p">)</span>
+
+</code></pre></div></div> <h2 id="-conclusion">🎉 Conclusion</h2> <p>And that’s a complete walkthrough of converting HDF5 format datasets to LeRobot v2.0 format!</p> <p>This conversion process is essential for leveraging the standardized LeRobot format, which offers several benefits:</p> <ol> <li> <strong>Consistency</strong>: A unified format for robot learning datasets</li> <li> <strong>Compatibility</strong>: Seamless integration with the LeRobot ecosystem</li> <li> <strong>Efficiency</strong>: Optimized storage and loading of robot data</li> <li> <strong>Flexibility</strong>: Support for different robot types and data modalities</li> </ol> <p>By following the steps outlined in this guide, you can effectively transform your HDF5 datasets into the LeRobot format, enabling better collaboration and model development in the robot learning community.</p> <p>Feel free to adapt this code to your specific robot setup and data requirements. Happy coding! 🤖✨</p> </div> </article> <br> <hr> <br> <ul class="list-disc pl-8"></ul> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoy Reading This Article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="/blog/2026/RoboTwinProcessData/">Data Processing for PI Model in RoboTwin</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="/blog/2026/Dream2Flow/">Dream2Flow 用 3D 物体流连接视频生成与开放世界操作</a> </li> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Hongxiao Yu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> <script src="/assets/js/bootstrap.bundle.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=a0db7e5d5c70cc3252b3138b0c91dcaf" type="text/javascript"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/js/zoom.js?v=85ddb88934d28b74e78031fd54cf8308"></script> <script src="/assets/js/no_defer.js?v=2781658a0a2b13ed609542042a859126"></script> <script defer src="/assets/js/common.js?v=c15de51d4bb57887caa2c21988d97279"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=d9f17b6adc2311cbabd747f4538bb15f"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/js/mathjax-setup.js?v=a5bb4e6a542c546dd929b24b8b236dfd"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script defer src="/assets/js/progress-bar.js?v=2f30e0e6801ea8f5036fa66e1ab0a71a" type="text/javascript"></script> <script src="/assets/js/vanilla-back-to-top.min.js?v=f40d453793ff4f64e238e420181a1d17"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/js/search/ninja-keys.min.js?v=a3446f084dcaecc5f75aa1757d087dcf"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/js/search-setup.js?v=6c304f7b1992d4b60f7a07956e52f04a"></script> <script src="/assets/js/search-data.js"></script> <script src="/assets/js/shortcut-key.js?v=ccc841c459bfc0e64c1c2b5acd10df02"></script> </body> </html>

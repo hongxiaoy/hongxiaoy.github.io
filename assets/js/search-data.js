@@ -16,7 +16,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/blog/";
           },
-        },{id: "post-data-processing-for-pi-model-in-robotwin",
+        },{id: "post-converting-hdf5-format-dataset-to-lerobot-v2-0",
+        
+          title: "Converting HDF5 Format Dataset to LeRobot v2.0",
+        
+        description: "A comprehensive guide on transforming HDF5 format datasets into LeRobot v2.0 format, including dataset creation, helper functions, and data population processes.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/HDF5_to_LeRobot_v20/";
+          
+        },
+      },{id: "post-data-processing-for-pi-model-in-robotwin",
         
           title: "Data Processing for PI Model in RoboTwin",
         
